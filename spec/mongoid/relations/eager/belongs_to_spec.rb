@@ -159,5 +159,28 @@ describe Mongoid::Relations::Eager::BelongsTo do
         expect(game.person_id).to eql(id)
       end
     end
+
+    context "when relation is optional" do
+
+      context "belongs_to" do
+        let(:person) do
+          Person.create!
+        end
+
+        let(:project) do
+          Project.create!(name: "Train for Marathon", owner: nil)
+        end
+
+        before do
+          Task.create!(project: project, assigned_to: person)
+        end
+
+        it "should not raise an error" do
+          expect {
+            Task.includes(:assigned_to, project: [:owner]).first
+          }.to_not raise_error
+        end
+      end
+    end
   end
 end
