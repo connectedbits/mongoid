@@ -160,26 +160,25 @@ describe Mongoid::Relations::Eager::BelongsTo do
       end
     end
 
-    context "when relation is optional" do
+    context "when relation is nested" do
 
-      context "belongs_to" do
-        let(:person) do
-          Person.create!
-        end
+      let(:person) do
+        Person.create!
+      end
 
-        let(:project) do
-          Project.create!(name: "Train for Marathon", owner: nil)
-        end
+      let(:project) do
+        Project.create!(name: "Train for Marathon", person: person)
+      end
 
-        before do
-          Task.create!(project: project, assigned_to: person)
-        end
+      before do
+        Task.create!(project: project, person: nil)
+      end
 
-        it "should not raise an error" do
-          expect {
-            Task.includes(:assigned_to, project: [:owner]).first
-          }.to_not raise_error
-        end
+      it "should not raise an error" do
+        expect {
+          project = Task.includes(:person, project: [:person]).first
+        }.to_not raise_error
+        expect(project).to_not eql(nil)
       end
     end
   end
